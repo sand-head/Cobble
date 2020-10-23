@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Linq;
 using System.Text;
 
-namespace Cobble.Minecraft.Extensions
+namespace Cobble.Extensions
 {
     public static class SequenceReaderExtensions
     {

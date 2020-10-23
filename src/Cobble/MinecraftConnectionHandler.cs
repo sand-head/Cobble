@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
-using Cobble.Minecraft.Packets;
-using System;
+using Cobble.Packets;
 using System.Threading.Tasks;
 
-namespace Cobble.Minecraft
+namespace Cobble
 {
     public class MinecraftConnectionHandler : ConnectionHandler
     {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace Cobble.Minecraft.Extensions
+namespace Cobble.Extensions
 {
     public static class IServiceProviderExtensions
     {
