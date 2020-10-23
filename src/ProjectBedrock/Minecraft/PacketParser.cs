@@ -2,12 +2,14 @@
 using ProjectBedrock.Minecraft.Extensions;
 using ProjectBedrock.Minecraft.Packets;
 using System.Buffers;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ProjectBedrock.Minecraft
 {
     public interface IPacketParser
     {
-        bool TryParsePacket(ref ReadOnlySequence<byte> buffer, out Packet message);
+        bool TryParsePackets(ref ReadOnlySequence<byte> buffer, out List<Packet> packets);
     }
 
     public class PacketParser : IPacketParser
@@ -19,25 +21,31 @@ namespace ProjectBedrock.Minecraft
             _logger = logger;
         }
 
-        public bool TryParsePacket(ref ReadOnlySequence<byte> buffer, out Packet message)
+        public bool TryParsePackets(ref ReadOnlySequence<byte> buffer, out List<Packet> packets)
         {
             var reader = new SequenceReader<byte>(buffer);
-            var length = reader.ReadVarInt();
-            var packetId = reader.ReadVarInt();
-            _logger.LogInformation("length: {Length}, packet ID: {PacketId}", length, packetId);
+            packets = new List<Packet>();
 
-            message = packetId switch
+            while (reader.Remaining != 0)
             {
-                0 => new Handshake(
-                    ProtocolVersion: reader.ReadVarInt(),
-                    Address: reader.ReadString(),
-                    Port: reader.ReadUShort(),
-                    State: reader.ReadVarInt()),
-                // todo: add other packets to parse
-                _ => null
-            };
+                var length = reader.ReadVarInt();
+                var packetId = reader.ReadVarInt();
+                _logger.LogInformation("length: {Length}, packet ID: {PacketId}", length, packetId);
 
-            return message != null;
+                packets.Add((length, packetId) switch
+                {
+                    (1, 0) => new Request(),
+                    (_, 0) => new Handshake(
+                        ProtocolVersion: reader.ReadVarInt(),
+                        Address: reader.ReadString(),
+                        Port: reader.ReadUShort(),
+                        State: reader.ReadVarInt()),
+                    // todo: add other packets to parse
+                    _ => null
+                });
+            }
+
+            return packets.Any();
         }
     }
 }
