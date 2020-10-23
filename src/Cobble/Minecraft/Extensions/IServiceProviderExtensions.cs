@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace ProjectBedrock.Minecraft.Extensions
+namespace Cobble.Minecraft.Extensions
 {
     public static class IServiceProviderExtensions
     {

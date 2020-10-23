@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers;
 
-namespace ProjectBedrock.Minecraft.Packets
+namespace Cobble.Minecraft.Packets
 {
     public abstract record Packet()
     {

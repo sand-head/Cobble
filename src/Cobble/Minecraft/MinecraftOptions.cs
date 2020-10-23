@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace ProjectBedrock.Minecraft
+namespace Cobble.Minecraft
 {
     public class MinecraftOptions
     {
