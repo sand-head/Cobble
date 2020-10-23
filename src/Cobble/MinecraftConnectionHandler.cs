@@ -2,43 +2,42 @@
 using Microsoft.Extensions.Logging;
 using Cobble.Packets;
 using System.Threading.Tasks;
+using Cobble.Models;
+using System.Collections.Generic;
+using Bedrock.Framework.Protocols;
 
 namespace Cobble
 {
     public class MinecraftConnectionHandler : ConnectionHandler
     {
         private readonly ILogger<MinecraftConnectionHandler> _logger;
-        private readonly IPacketParser _parser;
 
-        public MinecraftConnectionHandler(ILogger<MinecraftConnectionHandler> logger, IPacketParser parser)
+        public MinecraftConnectionHandler(ILogger<MinecraftConnectionHandler> logger)
         {
             _logger = logger;
-            _parser = parser;
         }
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            var input = connection.Transport.Input;
             _logger.LogInformation("{ConnectionId} connected", connection.ConnectionId);
+
+            var protocol = new MinecraftProtocol();
+            var reader = connection.CreateReader();
+            var writer = connection.CreateWriter();
 
             while (!connection.ConnectionClosed.IsCancellationRequested)
             {
-                var result = await input.ReadAsync();
-                var buffer = result.Buffer;
+                var result = await reader.ReadAsync(protocol);
+                var packet = result.Message;
 
-                if (_parser.TryParsePackets(ref buffer, out var packets))
+                _logger.LogInformation("Received: {Packet}", packet);
+
+                if (result.IsCompleted)
                 {
-                    foreach (var packet in packets)
-                    {
-                        var response = ProcessPacket(packet);
-                        if (response != null)
-                        {
-                            // todo: write response to output
-                        }
-                    }
+                    break;
                 }
 
-                input.AdvanceTo(buffer.Start, buffer.End);
+                reader.Advance();
             }
 
             _logger.LogInformation("{ConnectionId} disconnected", connection.ConnectionId);
@@ -49,7 +48,13 @@ namespace Cobble
             _logger.LogInformation("packet: {Packet}", packet);
             return packet switch
             {
-                Request => new Response(""),
+                // todo: don't hardcode this response
+                Request => new Response(new ResponsePayload(
+                    Version: new ResponseVersion("1.16.3", 753),
+                    Players: new ResponsePlayers(69, 0, new List<SamplePlayer>()),
+                    Description: new ResponseDescription("this was a triumph"),
+                    Favicon: ""
+                    )),
                 _ => null
             };
         }

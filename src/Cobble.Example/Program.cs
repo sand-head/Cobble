@@ -1,20 +1,26 @@
+using Cobble.Extensions;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
-namespace Cobble
-{
-    public class Program
+WebHost.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        services.AddMinecraft();
+    })
+    .Configure((app) =>
+    {
+        app.UseRouting();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapGet("/", async context =>
+            {
+                await context.Response.WriteAsync("Hello World!");
+            });
+        });
+    })
+    .Build()
+    .Run();

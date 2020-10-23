@@ -16,8 +16,6 @@ namespace Cobble.Extensions
             {
                 options.EndPoint = endpoint ?? new IPEndPoint(IPAddress.Loopback, 25565);
             });
-
-            services.TryAddSingleton<IPacketParser, PacketParser>();
             return services;
         }
     }

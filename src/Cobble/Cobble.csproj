@@ -8,4 +8,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Bedrock.Framework" Version="0.1.61-alpha.g982f8f7fc9" />
+  </ItemGroup>
+
 </Project>

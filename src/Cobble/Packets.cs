@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cobble.Models;
+using System;
 using System.Buffers;
 
 namespace Cobble.Packets
@@ -13,7 +14,7 @@ namespace Cobble.Packets
     public record Pong(long Payload) : Packet();
 
     public record Request() : Packet();
-    public record Response(string JsonResponse) : Packet()
+    public record Response(ResponsePayload JsonResponse) : Packet()
     {
         public override void Write(IBufferWriter<byte> writer)
         {
