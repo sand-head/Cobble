@@ -27,9 +27,16 @@ namespace ProjectBedrock.Minecraft
                 var result = await input.ReadAsync();
                 var buffer = result.Buffer;
 
-                if (_parser.TryParsePacket(ref buffer, out var message))
+                if (_parser.TryParsePackets(ref buffer, out var packets))
                 {
-                    await ProcessPacketAsync(message);
+                    foreach (var packet in packets)
+                    {
+                        var response = ProcessPacket(packet);
+                        if (response != null)
+                        {
+                            // todo: write response to output
+                        }
+                    }
                 }
 
                 input.AdvanceTo(buffer.Start, buffer.End);
@@ -38,11 +45,14 @@ namespace ProjectBedrock.Minecraft
             _logger.LogInformation("{ConnectionId} disconnected", connection.ConnectionId);
         }
 
-        private Task ProcessPacketAsync(Packet packet)
+        private Packet ProcessPacket(Packet packet)
         {
             _logger.LogInformation("packet: {Packet}", packet);
-            // todo: process packets
-            throw new NotImplementedException();
+            return packet switch
+            {
+                Request => new Response(""),
+                _ => null
+            };
         }
     }
 }
