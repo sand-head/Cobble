@@ -31,9 +31,6 @@ namespace Cobble
             return true;
         }
 
-        public void WriteMessage(Packet message, IBufferWriter<byte> output)
-        {
-            throw new NotImplementedException();
-        }
+        public void WriteMessage(Packet message, IBufferWriter<byte> output) => message.Write(output);
     }
 }
