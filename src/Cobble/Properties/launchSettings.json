@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ProjectBedrock": {
+    "Cobble": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,

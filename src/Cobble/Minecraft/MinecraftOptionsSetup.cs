@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 
-namespace ProjectBedrock.Minecraft
+namespace Cobble.Minecraft
 {
     public class MinecraftOptionsSetup : IConfigureOptions<KestrelServerOptions>
     {

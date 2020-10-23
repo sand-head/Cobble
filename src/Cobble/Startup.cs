@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProjectBedrock.Minecraft.Extensions;
+using Cobble.Minecraft.Extensions;
 
-namespace ProjectBedrock
+namespace Cobble
 {
     public class Startup
     {
