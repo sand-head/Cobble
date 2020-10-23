@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Cobble.Minecraft.Extensions;
-using Cobble.Minecraft.Packets;
+using Cobble.Extensions;
+using Cobble.Packets;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cobble.Minecraft
+namespace Cobble
 {
     public interface IPacketParser
     {
