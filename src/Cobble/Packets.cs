@@ -1,47 +1,48 @@
 ﻿using Cobble.Extensions;
 using Cobble.Models;
 using System;
-using System.Buffers;
 using System.Buffers.Binary;
 using System.Text.Json;
 
 namespace Cobble.Packets
 {
-    public abstract record Packet()
+    public abstract record Packet(int PacketId)
     {
-        public virtual void Write(IBufferWriter<byte> writer) =>
-            throw new NotImplementedException("Writing this packet type is not intended.");
+        // note: please make sure that the lengths of the returned spans are trimmed properly
+        // this is really just a reminder to myself
+        public virtual Span<byte> ToSpan() =>
+            throw new NotImplementedException("Converting this packet type to Span is not intended.");
     }
 
-    public record Handshake(int ProtocolVersion, string Address, ushort Port, int State) : Packet();
+    public record Handshake(int ProtocolVersion, string Address, ushort Port, int State) : Packet(0);
 
     #region Status packets
 
-    public record Ping(long Payload) : Packet();
-    public record Pong(long Payload) : Packet()
+    public record Ping(long Payload) : Packet(1);
+    public record Pong(long Payload) : Packet(1)
     {
-        public override void Write(IBufferWriter<byte> writer)
+        public override Span<byte> ToSpan()
         {
-            var buffer = writer.GetSpan();
-            BinaryPrimitives.WriteInt64BigEndian(buffer, Payload);
-            writer.Advance(sizeof(long));
+            var payloadBuffer = new Span<byte>(new byte[sizeof(long)]);
+            BinaryPrimitives.WriteInt64BigEndian(payloadBuffer, Payload);
+            return payloadBuffer;
         }
     }
 
-    public record Request() : Packet();
-    public record Response(ResponsePayload JsonResponse) : Packet()
+    public record Request() : Packet(0);
+    public record Response(ResponsePayload JsonResponse) : Packet(0)
     {
-        public override void Write(IBufferWriter<byte> writer)
+        public override Span<byte> ToSpan()
         {
             var jsonResponse = JsonSerializer.Serialize(JsonResponse, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 IgnoreNullValues = true
             });
-            // todo: figure out writing packet headers (length and ID)
-            var buffer = writer.GetSpan(5 + jsonResponse.Length);
-            var length = buffer.WriteString(jsonResponse);
-            writer.Advance(length);
+            
+            var payloadBuffer = new Span<byte>(new byte[5 + jsonResponse.Length]);
+            var payloadLen = payloadBuffer.WriteString(jsonResponse);
+            return payloadBuffer[0..payloadLen];
         }
     }
 
@@ -49,9 +50,9 @@ namespace Cobble.Packets
 
     #region Login packets
 
-    public record LoginStart(string Username) : Packet();
-    public record EncryptionResponse(int SharedSecretLength, byte[] SharedSecret, int VerifyTokenLength, byte[] VerifyToken) : Packet();
-    public record LoginPluginResponse(int MessageId, bool Successful, byte[] Data) : Packet();
+    public record LoginStart(string Username) : Packet(0);
+    public record EncryptionResponse(int SharedSecretLength, byte[] SharedSecret, int VerifyTokenLength, byte[] VerifyToken) : Packet(1);
+    public record LoginPluginResponse(int MessageId, bool Successful, byte[] Data) : Packet(2);
 
     #endregion
 }
