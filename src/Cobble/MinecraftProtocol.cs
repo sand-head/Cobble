@@ -17,7 +17,7 @@ namespace Cobble
             message = (length, packetId) switch
             {
                 (1, 0) => new Request(),
-                (_, 0) => new Handshake(
+                (int x, 0) when x > 1 => new Handshake(
                     ProtocolVersion: reader.ReadVarInt(),
                     Address: reader.ReadString(),
                     Port: reader.ReadUShort(),
@@ -28,7 +28,7 @@ namespace Cobble
 
             consumed = reader.Position;
             examined = consumed;
-            return true;
+            return message != null;
         }
 
         public void WriteMessage(Packet message, IBufferWriter<byte> output) => message.Write(output);
