@@ -32,6 +32,20 @@ namespace Cobble
             return message != null;
         }
 
-        public void WriteMessage(Packet message, IBufferWriter<byte> output) => message.Write(output);
+        public void WriteMessage(Packet message, IBufferWriter<byte> output)
+        {
+            var payloadBuffer = message.ToSpan();
+
+            var packetIdBuffer = new Span<byte>(new byte[5]);
+            var packetIdLen = packetIdBuffer.WriteVarInt(message.PacketId);
+
+            var buffer = output.GetSpan(5 + packetIdLen + payloadBuffer.Length);
+            var lengthLen = buffer.WriteVarInt(packetIdLen + payloadBuffer.Length);
+            packetIdBuffer.CopyTo(buffer[lengthLen..]);
+            payloadBuffer.CopyTo(buffer[(lengthLen + packetIdLen)..]);
+
+            var totalLen = lengthLen + packetIdLen + payloadBuffer.Length;
+            output.Write(buffer[0..totalLen]);
+        }
     }
 }

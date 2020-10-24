@@ -5,7 +5,7 @@ namespace Cobble.Extensions
 {
     public static class SpanByteExtensions
     {
-        public static int WriteVarInt(this ref Span<byte> buffer, int value)
+        public static int WriteVarInt(this Span<byte> buffer, int value)
         {
             var i = 0;
             for (; (value & 128) != 0; i++)
@@ -13,14 +13,15 @@ namespace Cobble.Extensions
                 buffer[i] = (byte)(value & 127 | 128);
                 value = (int)((uint)value >> 7);
             }
-            buffer[++i] = (byte)value;
-            return i;
+            buffer[i] = (byte)value;
+            return i + 1;
         }
 
-        public static int WriteString(this ref Span<byte> buffer, string value)
+        public static int WriteString(this Span<byte> buffer, string value)
         {
-            var varIntLength = buffer.WriteVarInt(value.Length) + 1;
-            Encoding.UTF8.GetBytes(value).CopyTo(buffer[varIntLength..]);
+            var varIntLength = buffer.WriteVarInt(value.Length);
+            var bytes = Encoding.UTF8.GetBytes(value);
+            bytes.CopyTo(buffer[varIntLength..]);
             return varIntLength + value.Length;
         }
     }
