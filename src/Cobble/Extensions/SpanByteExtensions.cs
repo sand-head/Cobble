@@ -24,5 +24,12 @@ namespace Cobble.Extensions
             bytes.CopyTo(buffer[varIntLength..]);
             return varIntLength + value.Length;
         }
+
+        public static int WriteGuid(this Span<byte> buffer, Guid value)
+        {
+            var bytes = value.ToByteArray();
+            bytes.CopyTo(buffer);
+            return 16;
+        }
     }
 }

@@ -4,28 +4,19 @@ using Cobble.Packets;
 using System;
 using System.Buffers;
 
-namespace Cobble
+namespace Cobble.Protocols
 {
-    public class MinecraftProtocol : IMessageReader<Packet>, IMessageWriter<Packet>
+    public abstract class BaseProtocol : IMessageReader<Packet>, IMessageWriter<Packet>
     {
+        public abstract Packet GetPacket(ref SequenceReader<byte> reader, int length, int packetId);
+
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out Packet message)
         {
             var reader = new SequenceReader<byte>(input);
             var length = reader.ReadVarInt();
             var packetId = reader.ReadVarInt();
 
-            message = (length, packetId) switch
-            {
-                (1, 0) => new Request(),
-                (int x, 0) when x > 1 => new Handshake(
-                    ProtocolVersion: reader.ReadVarInt(),
-                    Address: reader.ReadString(),
-                    Port: reader.ReadUShort(),
-                    State: reader.ReadVarInt()),
-                (_, 1) => new Ping(Payload: reader.ReadLong()),
-                // todo: add other packets to parse
-                _ => null
-            };
+            message = GetPacket(ref reader, length, packetId);
 
             consumed = reader.Position;
             examined = consumed;
