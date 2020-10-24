@@ -27,36 +27,43 @@ namespace Cobble
 
             while (!connection.ConnectionClosed.IsCancellationRequested)
             {
-                var result = await reader.ReadAsync(protocol);
-                var packet = result.Message;
-
-                _logger.LogInformation("Received: {Packet}", packet);
-
-                if (result.IsCompleted)
+                try
                 {
-                    break;
-                }
+                    var result = await reader.ReadAsync(protocol);
+                    var packet = result.Message;
 
-                reader.Advance();
+                    _logger.LogInformation("Received: {Packet}", packet);
+
+                    if (packet != null && TryProcessPacket(packet, out var response))
+                    {
+                        _logger.LogInformation("Sending: {Packet}", response);
+                        await writer.WriteAsync(protocol, response);
+                    }
+                }
+                finally
+                {
+                    reader.Advance();
+                }
             }
 
             _logger.LogInformation("{ConnectionId} disconnected", connection.ConnectionId);
         }
 
-        private Packet ProcessPacket(Packet packet)
+        private bool TryProcessPacket(Packet packet, out Packet response)
         {
-            _logger.LogInformation("packet: {Packet}", packet);
-            return packet switch
+            response = packet switch
             {
                 // todo: don't hardcode this response
                 Request => new Response(new ResponsePayload(
                     Version: new ResponseVersion("1.16.3", 753),
                     Players: new ResponsePlayers(69, 0, new List<SamplePlayer>()),
                     Description: new ResponseDescription("this was a triumph"),
-                    Favicon: ""
+                    Favicon: null
                     )),
+                Ping(long payload) => new Pong(payload),
                 _ => null
             };
+            return response != null;
         }
     }
 }

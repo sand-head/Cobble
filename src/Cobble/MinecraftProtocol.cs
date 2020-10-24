@@ -22,6 +22,7 @@ namespace Cobble
                     Address: reader.ReadString(),
                     Port: reader.ReadUShort(),
                     State: reader.ReadVarInt()),
+                (_, 1) => new Ping(Payload: reader.ReadLong()),
                 // todo: add other packets to parse
                 _ => null
             };

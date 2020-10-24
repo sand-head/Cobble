@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cobble.Extensions
 {
-    public static class SequenceReaderExtensions
+    public static class SequenceReaderByteExtensions
     {
         public static int ReadVarInt(this ref SequenceReader<byte> reader)
         {
@@ -64,6 +64,18 @@ namespace Cobble.Extensions
                 Array.Reverse(slice);
             }
             return BitConverter.ToUInt16(slice, 0);
+        }
+
+        public static long ReadLong(this ref SequenceReader<byte> reader)
+        {
+            var slice = reader.UnreadSequence.Slice(0, 8).ToArray();
+            reader.Advance(8);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(slice);
+            }
+            return BitConverter.ToInt64(slice, 0);
         }
     }
 }
