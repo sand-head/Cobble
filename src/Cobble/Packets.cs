@@ -59,6 +59,7 @@ namespace Cobble.Packets
     #region Login packets
 
     public record LoginStart(string Username) : Packet(0);
+    public record EncryptionRequest(string ServerId, int PublicKeyLength, byte[] PublicKey, int VerifyTokenLength, byte[] VerifyToken) : Packet(1);
     public record EncryptionResponse(int SharedSecretLength, byte[] SharedSecret, int VerifyTokenLength, byte[] VerifyToken) : Packet(1);
     public record LoginPluginResponse(int MessageId, bool Successful, byte[] Data) : Packet(2);
 
