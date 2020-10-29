@@ -15,6 +15,11 @@ namespace Cobble.Protocols
             var reader = new SequenceReader<byte>(input);
             var length = reader.ReadVarInt();
             var packetId = reader.ReadVarInt();
+            if (length <= 0)
+            {
+                message = null;
+                return false;
+            }
 
             message = GetPacket(ref reader, length, packetId);
 
