@@ -17,7 +17,7 @@ namespace Cobble
         {
             options.Listen(_options.EndPoint, builder =>
             {
-                builder.UseConnectionHandler<MinecraftConnectionHandler>();
+                builder.UseConnectionHandler<CobbleConnectionHandler>();
             });
         }
     }
