@@ -6,14 +6,6 @@ using System.Text.Json;
 
 namespace Cobble.Packets
 {
-    public enum PacketState
-    {
-        Handshaking = 0,
-        Status,
-        Login,
-        Play
-    }
-
     public abstract record Packet(int PacketId)
     {
         // note: please make sure that the lengths of the returned spans are trimmed properly
@@ -22,7 +14,7 @@ namespace Cobble.Packets
             throw new NotImplementedException("Converting this packet type to Span is not intended.");
     }
 
-    public record Handshake(int ProtocolVersion, string Address, ushort Port, PacketState NextState) : Packet(0);
+    public record Handshake(int ProtocolVersion, string Address, ushort Port, ConnectionState NextState) : Packet(0);
 
     #region Status packets
 

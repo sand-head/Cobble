@@ -14,7 +14,7 @@ namespace Cobble.Protocols
                     ProtocolVersion: reader.ReadVarInt(),
                     Address: reader.ReadString(),
                     Port: reader.ReadUShort(),
-                    NextState: (PacketState)reader.ReadVarInt()),
+                    NextState: (ConnectionState)reader.ReadVarInt()),
                 _ => null
             };
         }
